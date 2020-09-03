@@ -6,6 +6,7 @@ import { ContactList } from "./ContactList";
 import { ContactDetails } from "./ContactDetails";
 import { AppHeader } from "./AppHeader";
 import { randomItem, StorageHandler } from "./StorageHandler";
+import { AddContact } from "./AddContactForm";
 
 interface AppState {
   contacts: ContactItem[];
@@ -19,7 +20,7 @@ export default class App extends React.Component<{}, AppState> {
 
     this.state = {
       contacts: [],
-      pageSection: "VIEW",
+      pageSection: "ADD",
       selectedItem: randomItem()
     };
   }
@@ -51,7 +52,7 @@ export default class App extends React.Component<{}, AppState> {
             console.log("Create item");
 
             StorageHandler.saveItem(randomItem()).then((items) => {
-              this.setState({ contacts: items });
+              this.setState({ contacts: items, pageSection: "ADD" });
             });
           }}
           clear={() => {
@@ -64,6 +65,7 @@ export default class App extends React.Component<{}, AppState> {
         />
 
         <div className="contentContainer">
+          {shouldAddItem && <AddContact />}
           {shouldViewItem && (
             <ContactDetails
               contact={this.state.selectedItem as ContactItem}

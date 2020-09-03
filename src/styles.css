@@ -185,3 +185,29 @@ body {
   margin-bottom: 4px;
   color: #6e7687;
 }
+
+/* add form */
+
+.AddForm {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.FormComponent {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+}
+
+.FormComponent p {
+  margin: 6px 0px;
+}
+
+.AddFormControls {
+  margin: 10px;
+  display: flex;
+  align-self: flex-end;
+  justify-content: center;
+}
