@@ -152,7 +152,7 @@ const randomItem = (): ContactItem => {
     lastName: `Romero ${randomValue}`,
     age: randomValue,
     phoneNumber: "8092201111",
-    jobPosition: "Reportero",
+    jobPosition: `Reportero ${randomValue}`,
     documentIdentifier: "00112345678",
     email: `mail${randomValue}@mail.com`,
     homeAddress: `Calle primero #${randomValue} Santo domingo`
