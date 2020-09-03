@@ -49,15 +49,9 @@ export default class App extends React.Component<{}, AppState> {
             this.setState({ pageSection: "LIST" });
           }}
           add={() => {
-            console.log("Create item");
-
-            StorageHandler.saveItem(randomItem()).then((items) => {
-              this.setState({ contacts: items, pageSection: "ADD" });
-            });
+            this.setState({ pageSection: "ADD" });
           }}
           clear={() => {
-            console.log("Clear data");
-
             StorageHandler.clearData().then((items) => {
               this.setState({ contacts: items });
             });
@@ -67,6 +61,7 @@ export default class App extends React.Component<{}, AppState> {
         <div className="contentContainer">
           {shouldAddItem && (
             <AddContact
+              contact={this.state.selectedItem}
               onSave={(item: ContactItem) => {
                 StorageHandler.saveItem(item).then((items) => {
                   this.setState({ contacts: items, pageSection: "LIST" });
@@ -79,6 +74,9 @@ export default class App extends React.Component<{}, AppState> {
           )}
           {shouldViewItem && (
             <ContactDetails
+              onUpdate={() => {
+                this.setState({ pageSection: "ADD" });
+              }}
               contact={this.state.selectedItem as ContactItem}
               onDelete={this.deleteContact}
             />

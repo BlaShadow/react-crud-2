@@ -12,6 +12,7 @@ interface AddContactState {
 
 export class AddContact extends React.Component<
   {
+    contact?: ContactItem;
     onCancel: () => void;
     onSave: (_: ContactItem) => void;
   },
@@ -20,13 +21,15 @@ export class AddContact extends React.Component<
   constructor(props: any) {
     super(props);
 
+    console.log("Add contact form constructor", this.props.contact);
+
     this.state = {
-      name: "",
-      lastName: "",
-      age: 0,
-      document: "",
-      phone: "",
-      email: ""
+      name: this.props.contact?.name || "",
+      lastName: this.props.contact?.lastName || "",
+      age: this.props.contact?.age || 0,
+      document: this.props.contact?.documentIdentifier || "",
+      phone: this.props.contact?.phoneNumber || "",
+      email: this.props.contact?.email || ""
     };
   }
   public render() {

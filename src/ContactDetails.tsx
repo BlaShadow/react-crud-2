@@ -4,6 +4,7 @@ import { ContactItem } from "./Types";
 export class ContactDetails extends React.Component<{
   contact: ContactItem;
   onDelete: (_: ContactItem) => void;
+  onUpdate: () => void;
 }> {
   public render() {
     const item = this.props.contact;
@@ -39,7 +40,12 @@ export class ContactDetails extends React.Component<{
           >
             Eliminar
           </p>
-          <p className="detailsButton noSelection primaryButton">Actualizar</p>
+          <p
+            className="detailsButton noSelection primaryButton"
+            onClick={this.props.onUpdate}
+          >
+            Actualizar
+          </p>
         </div>
       </div>
     );

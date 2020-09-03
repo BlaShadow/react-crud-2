@@ -22,7 +22,8 @@ export class StorageHandler {
   static listContactKey: string = "CONCATS";
 
   static saveItem(newItem: ContactItem): Promise<ContactItem[]> {
-    return this.contactItems()
+    return this.deleteContact(newItem)
+      .then(() => this.contactItems())
       .then((oldItems: ContactItem[]) => {
         const values = [newItem, ...oldItems];
         const jsonValue = JSON.stringify(values);
