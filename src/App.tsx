@@ -65,7 +65,18 @@ export default class App extends React.Component<{}, AppState> {
         />
 
         <div className="contentContainer">
-          {shouldAddItem && <AddContact />}
+          {shouldAddItem && (
+            <AddContact
+              onSave={(item: ContactItem) => {
+                StorageHandler.saveItem(item).then((items) => {
+                  this.setState({ contacts: items, pageSection: "LIST" });
+                });
+              }}
+              onCancel={() => {
+                this.setState({ pageSection: "LIST" });
+              }}
+            />
+          )}
           {shouldViewItem && (
             <ContactDetails
               contact={this.state.selectedItem as ContactItem}
