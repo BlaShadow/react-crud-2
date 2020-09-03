@@ -95,7 +95,9 @@ export default class App extends React.Component<{}, AppState> {
   };
 
   public deleteContact = (item: ContactItem) => {
-    console.log("Delete item");
+    StorageHandler.deleteContact(item).then((items) => {
+      this.setState({ pageSection: "LIST", contacts: items });
+    });
   };
 }
 
@@ -146,14 +148,16 @@ class ItemDetails extends React.Component<{
 
 const randomItem = (): ContactItem => {
   const randomValue = Math.round(Math.random() * 1000);
+  const value = `000${randomValue}`;
+  const documentIdentifier = `${value.substr(value.length - 3)}12345678`;
 
   return {
     name: `Luis ${randomValue}`,
-    lastName: `Romero ${randomValue}`,
+    lastName: `Perez ${randomValue}`,
     age: randomValue,
     phoneNumber: "8092201111",
     jobPosition: `Reportero ${randomValue}`,
-    documentIdentifier: "00112345678",
+    documentIdentifier: documentIdentifier,
     email: `mail${randomValue}@mail.com`,
     homeAddress: `Calle primero #${randomValue} Santo domingo`
   };
@@ -243,9 +247,21 @@ class StorageHandler {
       });
   }
 
-  static clearData(): Promise<ContactItem[]> {
+  static deleteContact(selected: ContactItem): Promise<ContactItem[]> {
+    return this.contactItems().then((items: ContactItem[]) => {
+      console.log("Total 1 " + items.length);
+      const result = items.filter(
+        (item) => item.documentIdentifier !== selected.documentIdentifier
+      );
+      console.log("Total 2 " + result.length);
+
+      return this.clearData(result);
+    });
+  }
+
+  static clearData(items: ContactItem[] = []): Promise<ContactItem[]> {
     return localforage
-      .setItem(this.listContactKey, JSON.stringify([]))
+      .setItem(this.listContactKey, JSON.stringify(items))
       .then(() => {
         return this.contactItems();
       });
