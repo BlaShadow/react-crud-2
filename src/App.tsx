@@ -1,19 +1,11 @@
 import * as React from "react";
-import localforage from "localforage";
 import "./styles.css";
 
-interface ContactItem {
-  name: string;
-  lastName: string;
-  age: number;
-  phoneNumber: string;
-  jobPosition: string;
-  documentIdentifier: string;
-  email: string;
-  homeAddress: string;
-}
-
-type PageSection = "LIST" | "ADD" | "VIEW";
+import { ContactItem, PageSection } from "./Types";
+import { ContactList } from "./ContactList";
+import { ContactDetails } from "./ContactDetails";
+import { AppHeader } from "./AppHeader";
+import { randomItem, StorageHandler } from "./StorageHandler";
 
 interface AppState {
   contacts: ContactItem[];
@@ -73,7 +65,7 @@ export default class App extends React.Component<{}, AppState> {
 
         <div className="contentContainer">
           {shouldViewItem && (
-            <ItemDetails
+            <ContactDetails
               contact={this.state.selectedItem as ContactItem}
               onDelete={this.deleteContact}
             />
@@ -99,181 +91,4 @@ export default class App extends React.Component<{}, AppState> {
       this.setState({ pageSection: "LIST", contacts: items });
     });
   };
-}
-
-class ItemDetails extends React.Component<{
-  contact: ContactItem;
-  onDelete: (_: ContactItem) => void;
-}> {
-  public render() {
-    const item = this.props.contact;
-
-    return (
-      <div>
-        <div className="itemDetails">
-          <div className="section">
-            <span className="valueLabel noSelection">Nombre</span>
-            <p className="value">{item.name}</p>
-            <span className="valueLabel noSelection">Apellido</span>
-            <p className="value">{item.lastName}</p>
-          </div>
-          <div className="section">
-            <span className="valueLabel noSelection">Edad</span>
-            <p className="value">{item.age}</p>
-            <span className="valueLabel noSelection">Telefono</span>
-            <p className="value">{item.phoneNumber}</p>
-          </div>
-          <div className="section">
-            <span className="valueLabel noSelection">Documento</span>
-            <p className="value">{item.documentIdentifier}</p>
-            <span className="valueLabel noSelection">Correo</span>
-            <p className="value">{item.email}</p>
-          </div>
-        </div>
-        <div className="detailsControls">
-          <p
-            className="detailsButton noSelection dangerButton"
-            onClick={() => {
-              this.props.onDelete(this.props.contact);
-            }}
-          >
-            Eliminar
-          </p>
-          <p className="detailsButton noSelection primaryButton">Actualizar</p>
-        </div>
-      </div>
-    );
-  }
-}
-
-const randomItem = (): ContactItem => {
-  const randomValue = Math.round(Math.random() * 1000);
-  const value = `000${randomValue}`;
-  const documentIdentifier = `${value.substr(value.length - 3)}12345678`;
-
-  return {
-    name: `Luis ${randomValue}`,
-    lastName: `Perez ${randomValue}`,
-    age: randomValue,
-    phoneNumber: "8092201111",
-    jobPosition: `Reportero ${randomValue}`,
-    documentIdentifier: documentIdentifier,
-    email: `mail${randomValue}@mail.com`,
-    homeAddress: `Calle primero #${randomValue} Santo domingo`
-  };
-};
-
-class AppHeader extends React.Component<{
-  clear: () => void;
-  add: () => void;
-  list: () => void;
-}> {
-  public render() {
-    return (
-      <div>
-        <p className="title noSelection">Manejo de contactos</p>
-        <p className="subTitle noSelection">Administra tus contactos</p>
-
-        <div className="controls">
-          <div className="optionButton noSelection" onClick={this.props.list}>
-            Listar
-          </div>
-          <div className="optionButton noSelection" onClick={this.props.add}>
-            Agregar
-          </div>
-
-          <div className="optionButton noSelection" onClick={this.props.clear}>
-            Limpiar
-          </div>
-        </div>
-      </div>
-    );
-  }
-}
-
-class ContactList extends React.Component<{
-  items: ContactItem[];
-  onItemClick: (_: ContactItem) => void;
-}> {
-  public render() {
-    console.log("Render list", this.props.items);
-
-    const items: ContactItem[] = this.props.items || [];
-
-    return (
-      <div className="itemContainer">
-        {items.map((item: ContactItem, index: number) => {
-          return (
-            <div
-              className="itemRow"
-              key={index}
-              onClick={() => {
-                this.props.onItemClick(item);
-              }}
-            >
-              <div className="section">
-                <span className="valueLabel noSelection">Nombre</span>
-                <p className="value">{item.name}</p>
-                <span className="valueLabel noSelection">Apellido</span>
-                <p className="value">{item.lastName}</p>
-              </div>
-              <div className="section">
-                <span className="valueLabel noSelection">Edad</span>
-                <p className="value">{item.age}</p>
-                <span className="valueLabel noSelection">Telefono</span>
-                <p className="value">{item.phoneNumber}</p>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-    );
-  }
-}
-
-class StorageHandler {
-  static listContactKey: string = "CONCATS";
-
-  static saveItem(newItem: ContactItem): Promise<ContactItem[]> {
-    return this.contactItems()
-      .then((oldItems: ContactItem[]) => {
-        const values = [newItem, ...oldItems];
-        const jsonValue = JSON.stringify(values);
-
-        return localforage.setItem(this.listContactKey, jsonValue);
-      })
-      .then(() => {
-        return this.contactItems();
-      });
-  }
-
-  static deleteContact(selected: ContactItem): Promise<ContactItem[]> {
-    return this.contactItems().then((items: ContactItem[]) => {
-      console.log("Total 1 " + items.length);
-      const result = items.filter(
-        (item) => item.documentIdentifier !== selected.documentIdentifier
-      );
-      console.log("Total 2 " + result.length);
-
-      return this.clearData(result);
-    });
-  }
-
-  static clearData(items: ContactItem[] = []): Promise<ContactItem[]> {
-    return localforage
-      .setItem(this.listContactKey, JSON.stringify(items))
-      .then(() => {
-        return this.contactItems();
-      });
-  }
-
-  static contactItems(): Promise<ContactItem[]> {
-    return localforage.getItem(this.listContactKey).then((oldValue) => {
-      if (oldValue === undefined || oldValue === null) {
-        return [];
-      }
-
-      return JSON.parse(String(oldValue));
-    });
-  }
 }
